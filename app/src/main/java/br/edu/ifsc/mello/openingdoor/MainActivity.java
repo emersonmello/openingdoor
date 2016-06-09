@@ -17,11 +17,12 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, true);
     }
 
     public void createAccount(View view){
-
+        Intent intent = new Intent(this, CreateAccountActivity.class);
+        startActivity(intent);
     }
 
     public void authentication(View view){

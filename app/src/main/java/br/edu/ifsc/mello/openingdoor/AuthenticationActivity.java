@@ -3,20 +3,16 @@ package br.edu.ifsc.mello.openingdoor;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.daon.identityx.exception.UafProcessingException;
 import com.daon.identityx.uaf.FidoOperation;
-import com.daon.identityx.uaf.HttpUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -133,12 +129,12 @@ public class AuthenticationActivity extends BaseActivity {
 
         @Override
         protected String doInBackground(String... args) {
+            done = true;
             try {
                 result = HttpUtils.get(args[0]).getPayload();
             } catch (Exception e) {
                 return "";
             }
-            done = true;
             return result;
         }
 

@@ -46,7 +46,7 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
+            android:launchMode="singleInstance">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="br.edu.ifsc.mello.openingdoor.MainActivity" />
@@ -58,6 +58,12 @@
             android:screenOrientation="portrait"
             android:launchMode="singleTask">
 
+        </activity>
+        <activity
+            android:name=".CreateAccountActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask">
         </activity>
 
 
