@@ -22,28 +22,26 @@ public class MainActivity extends BaseActivity {
 
     public void createAccount(View view){
         Intent intent = new Intent(this, RegisterActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,1);
     }
 
     public void authentication(View view){
         Intent intent = new Intent(this, AuthenticationActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent,2);
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Bundle extra = data.getExtras();
+        switch (requestCode){
+            case 1:
+                break;
+            case 2:
+                break;
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

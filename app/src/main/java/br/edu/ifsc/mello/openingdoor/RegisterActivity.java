@@ -3,6 +3,7 @@ package br.edu.ifsc.mello.openingdoor;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -12,6 +13,7 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Toast;
 
+import com.daon.identityx.exception.UafProcessingException;
 import com.daon.identityx.uaf.FidoOperation;
 
 import org.json.JSONException;
@@ -129,11 +131,11 @@ public class RegisterActivity extends BaseActivity {
             super.onPostExecute(result);
             showProgress(false);
             if (result != null) {
-                Intent intent = new Intent(ApplicationContextDoorLock.getContext(), MainActivity.class);
                 Bundle extras = new Bundle();
                 extras.putString("registered", result);
+                Intent intent = new Intent();
                 intent.putExtras(extras);
-                startActivity(intent);
+                setResult(RESULT_OK,intent);
                 finish();
             }
         }
@@ -191,7 +193,12 @@ public class RegisterActivity extends BaseActivity {
                 extra.putString("rpServerEndpoint", rpEndpoint);
 
                 intent.putExtras(extra);
-                sendUafClientIntent(intent, FidoOpCommsType.Return);
+                try {
+                    sendUafClientIntent(intent, FidoOpCommsType.Return);
+                }catch (UafProcessingException e){
+                    Toast toast = Toast.makeText(ApplicationContextDoorLock.getContext(), R.string.no_fido_client_found, Toast.LENGTH_LONG);
+                    toast.show();
+                }
             } else {
                 Toast toast = Toast.makeText(ApplicationContextDoorLock.getContext(), R.string.connection_error, Toast.LENGTH_LONG);
                 toast.show();

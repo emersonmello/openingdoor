@@ -149,7 +149,6 @@ public class AuthenticationActivity extends BaseActivity {
                 Intent intent = getUafClientUtils().getUafOperationIntent(FidoOperation.Authentication,
                         result);
                 Bundle extra = intent.getExtras();
-//            extra.putString("rpServerEndpoint",rpEndpoint);
                 intent.putExtras(extra);
                 try {
                     sendUafClientIntent(intent, FidoOpCommsType.Return);

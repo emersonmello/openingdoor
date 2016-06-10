@@ -16,6 +16,7 @@
 
 package br.edu.ifsc.mello.openingdoor;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ResolveInfo;
