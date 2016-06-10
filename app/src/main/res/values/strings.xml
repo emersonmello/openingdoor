@@ -23,8 +23,8 @@
     <string name="pref_title_reg_op_request">Registration Operation Request</string>
     <string name="pref_default_reg_op_request">/fidouaf/v1/public/regRequest</string>
 
-    <string name="createAccountMessage">Create an account</string>
-    <string name="statusMessage">User is not registered yet.</string>
+    <string name="registerAuthenticatorMessage">Register</string>
+    <string name="statusMessage">FIDO UAF Client is not registered yet.</string>
     <string name="authenticationMessage">Do an authentication request</string>
     <string name="servicedescription">Service card reader</string>
     <string name="aiddescription">aiddescription</string>

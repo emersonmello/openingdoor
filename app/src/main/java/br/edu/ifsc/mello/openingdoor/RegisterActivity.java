@@ -17,7 +17,7 @@ import com.daon.identityx.uaf.FidoOperation;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CreateAccountActivity extends BaseActivity {
+public class RegisterActivity extends BaseActivity {
 
     private CreateAccountTask createAccountTask = null;
     private View mProgressView;
@@ -27,7 +27,7 @@ public class CreateAccountActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_account);
+        setContentView(R.layout.activity_register);
         mProgressView = findViewById(R.id.account_progress);
         mSharedPreferences = ApplicationContextDoorLock.getsSharedPreferences();
         createAccount();
