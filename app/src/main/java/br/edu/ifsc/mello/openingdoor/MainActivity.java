@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        PreferenceManager.setDefaultValues(this, R.xml.pref_general, true);
+        PreferenceManager.setDefaultValues(ApplicationContextDoorLock.getContext(), R.xml.pref_general, false);
     }
 
     public void createAccount(View view) {
@@ -44,19 +44,33 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle extra = data.getExtras();
         Toast toast;
+        String result;
+        String[] status;
+        String response;
+        Gson gson = new Gson();
         switch (requestCode) {
             case REG:
+                result = extra.getString("result");
+                // **************************************************
+                // It is specific for eBay RP Server Response - github.com/eBay/UAF
+                status = result.split("#ServerResponse\n");
+                response = status[1].trim();
+                response = response.substring(1,response.length()-1);
+                ServerResponseReg serverResponseReg = gson.fromJson(response,ServerResponseReg.class);
+                // **************************************************
                 //TODO Do something instead of toast message!
-                toast = Toast.makeText(getApplicationContext(), "Successful", Toast.LENGTH_SHORT);
+                toast = Toast.makeText(getApplicationContext(), serverResponseReg.getStatus(), Toast.LENGTH_SHORT);
                 toast.show();
                 break;
             case AUTH:
-                String result = extra.getString("result");
-                String[] status = result.split("#ServerResponse\n");
-                String response = status[1].trim();
+                result = extra.getString("result");
+                // **************************************************
+                // It is specific for eBay RP Server Response - github.com/eBay/UAF
+                status = result.split("#ServerResponse\n");
+                response = status[1].trim();
                 response = response.substring(1,response.length()-1);
-                Gson gson = new Gson();
                 ServerResponse serverResponse = gson.fromJson(response,ServerResponse.class);
+                // **************************************************
                 //TODO Do something instead of toast message!
                 toast = Toast.makeText(getApplicationContext(), serverResponse.getStatus(), Toast.LENGTH_SHORT);
                 toast.show();

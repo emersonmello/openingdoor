@@ -12,8 +12,10 @@ import android.preference.PreferenceActivity;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
+import android.widget.Toast;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -89,13 +91,24 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_settings, menu);
+        return true;
+    }
+
+
+    @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            if (!super.onMenuItemSelected(featureId, item)) {
-                NavUtils.navigateUpFromSameTask(this);
-            }
+            NavUtils.navigateUpFromSameTask(this);
             return true;
+        }
+        if (id == R.id.action_reset) {
+            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().clear().commit();
+            PreferenceManager.setDefaultValues(ApplicationContextDoorLock.getContext(), R.xml.pref_general, true);
+            getFragmentManager().beginTransaction().replace(android.R.id.content, new GeneralPreferenceFragment()).commit();
+            Toast.makeText(getApplicationContext(), "Back to default settings", Toast.LENGTH_SHORT).show();
         }
         return super.onMenuItemSelected(featureId, item);
     }
@@ -130,16 +143,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("fido_auth_request"));
             bindPreferenceSummaryToValue(findPreference("fido_auth_response"));
             bindPreferenceSummaryToValue(findPreference("fido_dereg_request"));
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
         }
     }
 }

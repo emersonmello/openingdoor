@@ -37,5 +37,6 @@
     <string name="internal_server_error">Internal Server Error</string>
     <string name="connection_error">The server is not reachable</string>
     <string name="button_done">Done</string>
+    <string name="action_reset">Reset</string>
 
 </resources>
