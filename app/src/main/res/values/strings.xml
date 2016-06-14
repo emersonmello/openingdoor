@@ -38,5 +38,11 @@
     <string name="connection_error">The server is not reachable</string>
     <string name="button_done">Done</string>
     <string name="action_reset">Reset</string>
+    <string name="username_label">Username:</string>
+    <string name="keyid_label">KeyId:</string>
+    <string name="pubkey_label">PubKey:</string>
+    <string name="DeRegMessage">DeRegister</string>
+    <string name="pubkey_title">Public Key</string>
+    <string name="server_label">Endpoint:</string>
 
 </resources>

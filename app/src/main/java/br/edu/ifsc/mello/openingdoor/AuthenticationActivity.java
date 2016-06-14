@@ -26,6 +26,7 @@ public class AuthenticationActivity extends BaseActivity {
     private UserResponseAsyncTask mUserResponseAsyncTask = null;
     private SharedPreferences mSharedPreferences;
     private ApplicationContextDoorLock mApplicationContextDoorLock = ApplicationContextDoorLock.getInstance();
+    private boolean nfc;
 
 
     @Override
@@ -34,6 +35,11 @@ public class AuthenticationActivity extends BaseActivity {
         setContentView(R.layout.activity_authentication);
         mProgressView = findViewById(R.id.auth_progress);
         mSharedPreferences = ApplicationContextDoorLock.getsSharedPreferences();
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            nfc = extras.getBoolean("NFC", false);
+        }
         this.attemptAuth();
 
     }
@@ -68,13 +74,14 @@ public class AuthenticationActivity extends BaseActivity {
         mApplicationContextDoorLock.setPayload("SUCCESS");
         mApplicationContextDoorLock.setTryingToAuthenticate(false);
         if (result != null) {
-            Bundle extras = new Bundle();
-            //saveAAIDandKeyID(serverResponse);
-            extras.putString("result", result);
-            Intent intent = new Intent();
-            intent.putExtras(extras);
-            setResult(RESULT_OK,intent);
-        }else{
+            if (!nfc) {
+                Bundle extras = new Bundle();
+                extras.putString("result", result);
+                Intent intent = new Intent();
+                intent.putExtras(extras);
+                setResult(RESULT_OK, intent);
+            }
+        } else {
             Toast toast = Toast.makeText(getApplicationContext(), "Something is wrong!", Toast.LENGTH_SHORT);
             toast.show();
         }
@@ -166,7 +173,7 @@ public class AuthenticationActivity extends BaseActivity {
                     toast.show();
                     finish();
                 }
-            }else{
+            } else {
                 Toast toast = Toast.makeText(ApplicationContextDoorLock.getContext(), R.string.connection_error, Toast.LENGTH_LONG);
                 toast.show();
                 finish();

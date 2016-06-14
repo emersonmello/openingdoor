@@ -1,6 +1,8 @@
 package br.edu.ifsc.mello.openingdoor;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -17,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
 
     private final int REG = 1;
     private final int AUTH = 2;
+    private SharedPreferences mSharedPreferences;
+    private ApplicationContextDoorLock mApplicationContextDoorLock = ApplicationContextDoorLock.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +31,32 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         PreferenceManager.setDefaultValues(ApplicationContextDoorLock.getContext(), R.xml.pref_general, false);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(ApplicationContextDoorLock.getContext());
+        init();
     }
+
+    private void init() {
+
+        String username = mSharedPreferences.getString("usernameMain", "");
+        View cardReg = findViewById(R.id.card_register);
+        View cardDetails = findViewById(R.id.card_userdetails);
+        if (username.isEmpty()) {
+            cardReg.setVisibility(View.VISIBLE);
+            cardDetails.setVisibility(View.GONE);
+        } else {
+            TextView textView = (TextView) findViewById(R.id.username);
+            textView.setText(username);
+            TextView keyid = (TextView) findViewById(R.id.keyid);
+            keyid.setText(mSharedPreferences.getString("keyid", ""));
+            TextView pubkey = (TextView) findViewById(R.id.publickey);
+            pubkey.setText(mSharedPreferences.getString("pubkey", ""));
+            TextView server = (TextView) findViewById(R.id.server);
+            server.setText(mSharedPreferences.getString("server", ""));
+            cardReg.setVisibility(View.GONE);
+            cardDetails.setVisibility(View.VISIBLE);
+        }
+    }
+
 
     public void createAccount(View view) {
         Intent intent = new Intent(this, RegisterActivity.class);
@@ -38,6 +68,49 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, AUTH);
     }
 
+    public void dereg(View view) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.remove("usernameMain");
+        editor.remove("keyid");
+        editor.remove("pubkey");
+        editor.remove("server");
+        editor.apply();
+        init();
+        //TODO Invoke FIDO UAF Client to do DeReg
+    }
+
+    public void showPubKey(View view) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.pubkey_title)
+                .setMessage(mSharedPreferences.getString("pubkey", ""))
+                .setNeutralButton(R.string.button_done, null).show();
+
+    }
+
+    private void updateMainLayout(ServerResponseReg serverResponseReg) {
+        if (serverResponseReg.getStatus().equals("SUCCESS")) {
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            editor.putString("usernameMain", serverResponseReg.getUsername());
+            editor.putString("keyid", serverResponseReg.getAuthenticator().getKeyID());
+            editor.putString("pubkey", serverResponseReg.getPublicKey());
+            editor.putString("server", mSharedPreferences.getString("fido_server_endpoint", ""));
+            editor.apply();
+            View cardReg = findViewById(R.id.card_register);
+            cardReg.setVisibility(View.GONE);
+            View cardDetails = findViewById(R.id.card_userdetails);
+
+            TextView username = (TextView) findViewById(R.id.username);
+            username.setText(serverResponseReg.getUsername());
+            TextView keyid = (TextView) findViewById(R.id.keyid);
+            keyid.setText(serverResponseReg.getAuthenticator().getKeyID());
+            TextView pubkey = (TextView) findViewById(R.id.publickey);
+            pubkey.setText(serverResponseReg.getPublicKey());
+            TextView server = (TextView) findViewById(R.id.server);
+            server.setText(mSharedPreferences.getString("fido_server_endpoint", ""));
+
+            cardDetails.setVisibility(View.VISIBLE);
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -55,8 +128,10 @@ public class MainActivity extends AppCompatActivity {
                 // It is specific for eBay RP Server Response - github.com/eBay/UAF
                 status = result.split("#ServerResponse\n");
                 response = status[1].trim();
-                response = response.substring(1,response.length()-1);
-                ServerResponseReg serverResponseReg = gson.fromJson(response,ServerResponseReg.class);
+                response = response.substring(1, response.length() - 1);
+                ServerResponseReg serverResponseReg = gson.fromJson(response, ServerResponseReg.class);
+                this.updateMainLayout(serverResponseReg);
+
                 // **************************************************
                 //TODO Do something instead of toast message!
                 toast = Toast.makeText(getApplicationContext(), serverResponseReg.getStatus(), Toast.LENGTH_SHORT);
@@ -68,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
                 // It is specific for eBay RP Server Response - github.com/eBay/UAF
                 status = result.split("#ServerResponse\n");
                 response = status[1].trim();
-                response = response.substring(1,response.length()-1);
-                ServerResponse serverResponse = gson.fromJson(response,ServerResponse.class);
+                response = response.substring(1, response.length() - 1);
+                ServerResponse serverResponse = gson.fromJson(response, ServerResponse.class);
                 // **************************************************
                 //TODO Do something instead of toast message!
                 toast = Toast.makeText(getApplicationContext(), serverResponse.getStatus(), Toast.LENGTH_SHORT);

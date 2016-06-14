@@ -95,9 +95,12 @@ public class MyHostApduService extends HostApduService {
         protected String doInBackground(String... params) {
             String message = params[0];
             if (message.equals(DoorProtocol.READY.getDesc())) {
+                Bundle data = new Bundle();
+                data.putBoolean("NFC",true);
                 Intent intent = new Intent(this.myHostApduService, AuthenticationActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                intent.putExtras(data);
                 startActivity(intent);
             }
             return DoorProtocol.WAIT.getDesc();

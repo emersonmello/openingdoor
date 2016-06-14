@@ -4,6 +4,7 @@ package br.edu.ifsc.mello.openingdoor;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -105,8 +106,22 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
         if (id == R.id.action_reset) {
-            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().clear().commit();
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String username = sharedPreferences.getString("usernameMain", "");
+            String keyid = sharedPreferences.getString("keyid", "");
+            String pubkey = sharedPreferences.getString("pubkey", "");
+
+            PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().clear().apply();
             PreferenceManager.setDefaultValues(ApplicationContextDoorLock.getContext(), R.xml.pref_general, true);
+
+            if (!username.isEmpty()){
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("usernameMain", username);
+                editor.putString("keyid", keyid);
+                editor.putString("pubkey", pubkey);
+                editor.apply();
+            }
+
             getFragmentManager().beginTransaction().replace(android.R.id.content, new GeneralPreferenceFragment()).commit();
             Toast.makeText(getApplicationContext(), "Back to default settings", Toast.LENGTH_SHORT).show();
         }
