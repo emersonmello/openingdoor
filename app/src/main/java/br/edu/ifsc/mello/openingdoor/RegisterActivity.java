@@ -84,10 +84,8 @@ public class RegisterActivity extends BaseActivity {
 
     @Override
     protected void processUafClientResponse(String uafResponseJson) {
-        //Sending the response message created by the client to the server
-//        Reg reg = new Reg();
-//        reg.clientSendRegResponse(uafResponseJson);
         showProgress(true);
+        //Sending the response message created by the client to the server
         ClientSendFIDORegResponseTask clientSendFIDORegResponseTask = new ClientSendFIDORegResponseTask();
         clientSendFIDORegResponseTask.execute(uafResponseJson);
     }
@@ -118,7 +116,6 @@ public class RegisterActivity extends BaseActivity {
             try {
                 String serverResponse = HttpUtils.post(url + endpoint, decoded).getPayload();
                 res.append(serverResponse);
-//                saveAAIDandKeyID(serverResponse);
                 return res.toString();
             } catch (Exception e) {
 
@@ -132,12 +129,16 @@ public class RegisterActivity extends BaseActivity {
             showProgress(false);
             if (result != null) {
                 Bundle extras = new Bundle();
-                extras.putString("registered", result);
+                //saveAAIDandKeyID(serverResponse);
+                extras.putString("result", result);
                 Intent intent = new Intent();
                 intent.putExtras(extras);
                 setResult(RESULT_OK,intent);
-                finish();
+            }else{
+                Toast toast = Toast.makeText(getApplicationContext(), "Something is wrong!", Toast.LENGTH_SHORT);
+                toast.show();
             }
+            finish();
         }
 
         @Override

@@ -64,11 +64,20 @@ public class AuthenticationActivity extends BaseActivity {
         mUserResponseAsyncTask.execute(uafResponseJson, url + endpoint);
     }
 
-    public void finishProcessing() {
-        Toast toast = Toast.makeText(getApplicationContext(), "Successful", Toast.LENGTH_SHORT);
-        toast.show();
+    public void finishProcessing(String result) {
         mApplicationContextDoorLock.setPayload("SUCCESS");
         mApplicationContextDoorLock.setTryingToAuthenticate(false);
+        if (result != null) {
+            Bundle extras = new Bundle();
+            //saveAAIDandKeyID(serverResponse);
+            extras.putString("result", result);
+            Intent intent = new Intent();
+            intent.putExtras(extras);
+            setResult(RESULT_OK,intent);
+        }else{
+            Toast toast = Toast.makeText(getApplicationContext(), "Something is wrong!", Toast.LENGTH_SHORT);
+            toast.show();
+        }
         finish();
     }
 
@@ -204,11 +213,11 @@ public class AuthenticationActivity extends BaseActivity {
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
             showProgress(false);
             mUserResponseAsyncTask = null;
-            finishProcessing();
+            finishProcessing(result);
         }
 
         @Override

@@ -3,12 +3,20 @@ package br.edu.ifsc.mello.openingdoor;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-public class MainActivity extends BaseActivity {
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+public class MainActivity extends AppCompatActivity {
+
+    private final int REG = 1;
+    private final int AUTH = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,14 +28,14 @@ public class MainActivity extends BaseActivity {
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, true);
     }
 
-    public void createAccount(View view){
+    public void createAccount(View view) {
         Intent intent = new Intent(this, RegisterActivity.class);
-        startActivityForResult(intent,1);
+        startActivityForResult(intent, REG);
     }
 
-    public void authentication(View view){
+    public void authentication(View view) {
         Intent intent = new Intent(this, AuthenticationActivity.class);
-        startActivityForResult(intent,2);
+        startActivityForResult(intent, AUTH);
     }
 
 
@@ -35,10 +43,23 @@ public class MainActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Bundle extra = data.getExtras();
-        switch (requestCode){
-            case 1:
+        Toast toast;
+        switch (requestCode) {
+            case REG:
+                //TODO Do something instead of toast message!
+                toast = Toast.makeText(getApplicationContext(), "Successful", Toast.LENGTH_SHORT);
+                toast.show();
                 break;
-            case 2:
+            case AUTH:
+                String result = extra.getString("result");
+                String[] status = result.split("#ServerResponse\n");
+                String response = status[1].trim();
+                response = response.substring(1,response.length()-1);
+                Gson gson = new Gson();
+                ServerResponse serverResponse = gson.fromJson(response,ServerResponse.class);
+                //TODO Do something instead of toast message!
+                toast = Toast.makeText(getApplicationContext(), serverResponse.getStatus(), Toast.LENGTH_SHORT);
+                toast.show();
                 break;
         }
     }
