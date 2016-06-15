@@ -49,7 +49,7 @@ public class AuthenticationActivity extends BaseActivity {
             return;
         }
         showProgress(true);
-        mAuthTask = new UserAuthenticationTask();
+        mAuthTask = new UserAuthenticationTask(this);
         String url = mSharedPreferences.getString("fido_server_endpoint", "");
         String endpoint = mSharedPreferences.getString("fido_auth_request", "");
         mAuthTask.execute(url + endpoint);
@@ -132,8 +132,15 @@ public class AuthenticationActivity extends BaseActivity {
      */
     public class UserAuthenticationTask extends AsyncTask<String, Integer, String> {
 
-        private String result = null;
-        private boolean done = false;
+        private String result;
+        private boolean done;
+        private AuthenticationActivity mAuthenticationActivity;
+
+        public UserAuthenticationTask(AuthenticationActivity authenticationActivity) {
+            mAuthenticationActivity = authenticationActivity;
+            result = null;
+            done = false;
+        }
 
         public boolean isDone() {
             return done;
@@ -169,13 +176,11 @@ public class AuthenticationActivity extends BaseActivity {
                 try {
                     sendUafClientIntent(intent, FidoOpCommsType.Return);
                 } catch (UafProcessingException e) {
-                    Toast toast = Toast.makeText(ApplicationContextDoorLock.getContext(), R.string.no_fido_client_found, Toast.LENGTH_LONG);
-                    toast.show();
+                    Toast.makeText(mAuthenticationActivity.getApplicationContext(), R.string.no_fido_client_found, Toast.LENGTH_LONG).show();
                     finish();
                 }
             } else {
-                Toast toast = Toast.makeText(ApplicationContextDoorLock.getContext(), R.string.connection_error, Toast.LENGTH_LONG);
-                toast.show();
+                Toast.makeText(mAuthenticationActivity.getApplicationContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
                 finish();
             }
         }

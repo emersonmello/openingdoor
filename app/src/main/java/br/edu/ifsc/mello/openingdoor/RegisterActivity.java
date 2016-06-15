@@ -3,7 +3,9 @@ package br.edu.ifsc.mello.openingdoor;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -24,7 +26,7 @@ public class RegisterActivity extends BaseActivity {
     private CreateAccountTask createAccountTask = null;
     private View mProgressView;
     private SharedPreferences mSharedPreferences;
-    private ApplicationContextDoorLock mApplicationContextDoorLock = ApplicationContextDoorLock.getInstance();
+    private ApplicationContextDoorLock mApplicationContextDoorLock;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class RegisterActivity extends BaseActivity {
         setContentView(R.layout.activity_register);
         mProgressView = findViewById(R.id.account_progress);
         mSharedPreferences = ApplicationContextDoorLock.getsSharedPreferences();
+        mApplicationContextDoorLock = ApplicationContextDoorLock.getInstance();
         createAccount();
     }
 
@@ -40,10 +43,10 @@ public class RegisterActivity extends BaseActivity {
             return;
         }
         showProgress(true);
-        String username = mSharedPreferences.getString("username", "").replaceAll("\\s+","");
+        String username = mSharedPreferences.getString("username", "").replaceAll("\\s+", "");
         String url = mSharedPreferences.getString("fido_server_endpoint", "");
         String endpoint = mSharedPreferences.getString("fido_reg_request", "");
-        createAccountTask = new CreateAccountTask();
+        createAccountTask = new CreateAccountTask(this);
         createAccountTask.execute(url + endpoint + "/" + username);
     }
 
@@ -73,20 +76,12 @@ public class RegisterActivity extends BaseActivity {
         }
     }
 
-    protected void endProgressWithError(String errorMsg) {
-        showProgress(false);
-        displayError(errorMsg);
-    }
-
-    protected void showLoggedIn() {
-        Snackbar.make(findViewById(R.id.layout_main), "Account created with successuful", Snackbar.LENGTH_LONG).show();
-    }
 
     @Override
     protected void processUafClientResponse(String uafResponseJson) {
         showProgress(true);
         //Sending the response message created by the client to the server
-        ClientSendFIDORegResponseTask clientSendFIDORegResponseTask = new ClientSendFIDORegResponseTask();
+        ClientSendFIDORegResponseTask clientSendFIDORegResponseTask = new ClientSendFIDORegResponseTask(this);
         clientSendFIDORegResponseTask.execute(uafResponseJson);
     }
 
@@ -98,6 +93,13 @@ public class RegisterActivity extends BaseActivity {
     }
 
     public class ClientSendFIDORegResponseTask extends AsyncTask<String, Void, String> {
+
+        private RegisterActivity mRegisterActivity;
+
+        public ClientSendFIDORegResponseTask(RegisterActivity registerActivity) {
+            mRegisterActivity = registerActivity;
+        }
+
 
         @Override
         protected String doInBackground(String... params) {
@@ -129,13 +131,12 @@ public class RegisterActivity extends BaseActivity {
             showProgress(false);
             if (result != null) {
                 Bundle extras = new Bundle();
-                //saveAAIDandKeyID(serverResponse);
                 extras.putString("result", result);
                 Intent intent = new Intent();
                 intent.putExtras(extras);
-                setResult(RESULT_OK,intent);
-            }else{
-                Toast toast = Toast.makeText(getApplicationContext(), "Something is wrong!", Toast.LENGTH_SHORT);
+                setResult(RESULT_OK, intent);
+            } else {
+                Toast toast = Toast.makeText(mRegisterActivity.getApplicationContext(), "Something is wrong!", Toast.LENGTH_SHORT);
                 toast.show();
             }
             finish();
@@ -153,8 +154,13 @@ public class RegisterActivity extends BaseActivity {
      */
     public class CreateAccountTask extends AsyncTask<String, Integer, String> {
 
+        private RegisterActivity mRegisterActivity;
         private String result = null;
         private boolean done = false;
+
+        public CreateAccountTask(RegisterActivity registerActivity) {
+            mRegisterActivity = registerActivity;
+        }
 
         public boolean isDone() {
             return done;
@@ -181,7 +187,7 @@ public class RegisterActivity extends BaseActivity {
                 createAccountTask = null;
                 this.result = result;
                 this.done = true;
-                String username = mSharedPreferences.getString("username", "").replaceAll("\\s+","");
+                String username = mSharedPreferences.getString("username", "").replaceAll("\\s+", "");
                 String url = mSharedPreferences.getString("fido_server_endpoint", "");
                 String endpoint = mSharedPreferences.getString("fido_reg_request", "");
                 String rpEndpoint = url + endpoint + "/" + username;
@@ -196,13 +202,12 @@ public class RegisterActivity extends BaseActivity {
                 intent.putExtras(extra);
                 try {
                     sendUafClientIntent(intent, FidoOpCommsType.Return);
-                }catch (UafProcessingException e){
-                    Toast toast = Toast.makeText(ApplicationContextDoorLock.getContext(), R.string.no_fido_client_found, Toast.LENGTH_LONG);
-                    toast.show();
+                } catch (UafProcessingException e) {
+                    Toast.makeText(mRegisterActivity.getApplicationContext(), R.string.no_fido_client_found, Toast.LENGTH_LONG).show();
                 }
             } else {
-                Toast toast = Toast.makeText(ApplicationContextDoorLock.getContext(), R.string.connection_error, Toast.LENGTH_LONG);
-                toast.show();
+                Context context = mRegisterActivity.getApplicationContext();
+                Toast.makeText(context, R.string.connection_error, Toast.LENGTH_LONG).show();
                 finish();
             }
         }

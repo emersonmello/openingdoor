@@ -63,7 +63,7 @@
             android:name=".RegisterActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask">
+            >
         </activity>
 
 
