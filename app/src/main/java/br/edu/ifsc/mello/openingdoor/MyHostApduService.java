@@ -13,10 +13,12 @@ public class MyHostApduService extends HostApduService {
     private ApplicationContextDoorLock mApplicationContextDoorLock;
     private ProtocolAsyncTask mProtocolAsyncTask = null;
     private String TAG;
+    private final String FIDO_KEY = "fido_result";
 
 
     public MyHostApduService() {
         mApplicationContextDoorLock = ApplicationContextDoorLock.getInstance();
+        mSharedPreferences = ApplicationContextDoorLock.getsSharedPreferences();
     }
 
     @Override
@@ -54,7 +56,8 @@ public class MyHostApduService extends HostApduService {
                             MyHostApduService.this.sendResponseApdu(DoorProtocol.DONE.getDesc().getBytes());
                             break;
                         case "ERROR":
-                            Log.d(TAG, "ERROR");
+                            String value = mSharedPreferences.getString(FIDO_KEY," nothing");
+                            Log.d(TAG, "ERROR: " + value);
                             mApplicationContextDoorLock.setPayload("nil");
                             mApplicationContextDoorLock.setHandShake(true);
                             MyHostApduService.this.sendResponseApdu(DoorProtocol.ERROR.getDesc().getBytes());

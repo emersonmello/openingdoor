@@ -27,6 +27,7 @@ public class AuthenticationActivity extends BaseActivity {
     private SharedPreferences mSharedPreferences;
     private ApplicationContextDoorLock mApplicationContextDoorLock = ApplicationContextDoorLock.getInstance();
     private boolean nfc;
+    private final String FIDO_KEY = "fido_result";
 
 
     @Override
@@ -82,8 +83,10 @@ public class AuthenticationActivity extends BaseActivity {
                 setResult(RESULT_OK, intent);
             }
         } else {
-            Toast toast = Toast.makeText(getApplicationContext(), "Something is wrong!", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(getApplicationContext(), "Something is wrong!", Toast.LENGTH_SHORT).show();
+            mApplicationContextDoorLock.setPayload("ERROR");
+            mApplicationContextDoorLock.setTryingToAuthenticate(false);
+            addSharedPrefs(FIDO_KEY, "Something is wrong!");
         }
         finish();
     }
@@ -115,15 +118,21 @@ public class AuthenticationActivity extends BaseActivity {
         }
     }
 
+    private void addSharedPrefs(String key, String value) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(key, value);
+        editor.apply();
+    }
+
     @Override
     protected void onActivityResultFailure(String errorMsg) {
         mAuthTask = null;
         mUserResponseAsyncTask = null;
         showProgress(false);
-        mApplicationContextDoorLock.setPayload("nil");
+        mApplicationContextDoorLock.setPayload("ERROR");
         mApplicationContextDoorLock.setTryingToAuthenticate(false);
-        Toast toast = Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT);
-        toast.show();
+        addSharedPrefs(FIDO_KEY, errorMsg);
+        Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT).show();
         finish();
     }
 
@@ -169,18 +178,24 @@ public class AuthenticationActivity extends BaseActivity {
                 this.done = true;
                 showProgress(false);
                 setCurrentFidoOperation(FidoOperation.Authentication);
-                Intent intent = getUafClientUtils().getUafOperationIntent(FidoOperation.Authentication,
-                        result);
+                Intent intent = getUafClientUtils()
+                        .getUafOperationIntent(FidoOperation.Authentication, result);
                 Bundle extra = intent.getExtras();
                 intent.putExtras(extra);
                 try {
                     sendUafClientIntent(intent, FidoOpCommsType.Return);
                 } catch (UafProcessingException e) {
                     Toast.makeText(mAuthenticationActivity.getApplicationContext(), R.string.no_fido_client_found, Toast.LENGTH_LONG).show();
+                    mApplicationContextDoorLock.setPayload("ERROR");
+                    mApplicationContextDoorLock.setTryingToAuthenticate(false);
+                    addSharedPrefs(FIDO_KEY, "no fido client found");
                     finish();
                 }
             } else {
                 Toast.makeText(mAuthenticationActivity.getApplicationContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
+                mApplicationContextDoorLock.setPayload("ERROR");
+                mApplicationContextDoorLock.setTryingToAuthenticate(false);
+                addSharedPrefs(FIDO_KEY, "connection error");
                 finish();
             }
         }
@@ -190,6 +205,7 @@ public class AuthenticationActivity extends BaseActivity {
             mAuthTask = null;
             mApplicationContextDoorLock.setPayload("ERROR");
             mApplicationContextDoorLock.setTryingToAuthenticate(false);
+            addSharedPrefs(FIDO_KEY,"canceled");
             showProgress(false);
         }
     }
@@ -237,6 +253,9 @@ public class AuthenticationActivity extends BaseActivity {
             super.onCancelled();
             showProgress(false);
             mUserResponseAsyncTask = null;
+            mApplicationContextDoorLock.setPayload("ERROR");
+            mApplicationContextDoorLock.setTryingToAuthenticate(false);
+            addSharedPrefs(FIDO_KEY, "canceled");
 
         }
     }

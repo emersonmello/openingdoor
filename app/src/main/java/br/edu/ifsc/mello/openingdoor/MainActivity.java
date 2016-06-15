@@ -127,28 +127,44 @@ public class MainActivity extends AppCompatActivity {
             switch (requestCode) {
                 case REG:
                     result = extra.getString("result");
-                    // **************************************************
-                    // It is specific for eBay RP Server Response - github.com/eBay/UAF
-                    status = result.split("#ServerResponse\n");
-                    response = status[1].trim();
-                    response = response.substring(1, response.length() - 1);
-                    ServerResponseReg serverResponseReg = gson.fromJson(response, ServerResponseReg.class);
-                    this.updateMainLayout(serverResponseReg);
-                    //TODO Do something instead of snackbar message!
-                    Snackbar.make(findViewById(R.id.layout_main), serverResponseReg.getStatus(), Snackbar.LENGTH_LONG).show();
-                    // **************************************************
+                    if (!result.isEmpty()) {
+                        // **************************************************
+                        // It is specific for eBay RP Server Response - github.com/eBay/UAF
+                        status = result.split("#ServerResponse\n");
+                        if (status.length > 1) {
+                            response = status[1].trim();
+                            response = response.substring(1, response.length() - 1);
+                            ServerResponseReg serverResponseReg = gson.fromJson(response, ServerResponseReg.class);
+                            this.updateMainLayout(serverResponseReg);
+                            //TODO Do something instead of snackbar message!
+                            Snackbar.make(findViewById(R.id.layout_main), serverResponseReg.getStatus(), Snackbar.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(this, "Something is wrong", Toast.LENGTH_SHORT).show();
+                        }
+                        // **************************************************
+                    } else {
+                        Toast.makeText(this, "Something is wrong", Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 case AUTH:
                     result = extra.getString("result");
-                    // **************************************************
-                    // It is specific for eBay RP Server Response - github.com/eBay/UAF
-                    status = result.split("#ServerResponse\n");
-                    response = status[1].trim();
-                    response = response.substring(1, response.length() - 1);
-                    ServerResponse serverResponse = gson.fromJson(response, ServerResponse.class);
-                    //TODO Do something instead of toast message!
-                    Toast.makeText(getApplicationContext(), serverResponse.getStatus(), Toast.LENGTH_SHORT).show();
-                    // **************************************************
+                    if (!result.isEmpty()) {
+                        // **************************************************
+                        // It is specific for eBay RP Server Response - github.com/eBay/UAF
+                        status = result.split("#ServerResponse\n");
+                        if (status.length > 1) {
+                            response = status[1].trim();
+                            response = response.substring(1, response.length() - 1);
+                            ServerResponse serverResponse = gson.fromJson(response, ServerResponse.class);
+                            //TODO Do something instead of toast message!
+                            Toast.makeText(getApplicationContext(), serverResponse.getStatus(), Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Something is wrong", Toast.LENGTH_SHORT).show();
+                        }
+                        // **************************************************
+                    } else {
+                        Toast.makeText(this, "Something is wrong", Toast.LENGTH_SHORT).show();
+                    }
                     break;
             }
         }
