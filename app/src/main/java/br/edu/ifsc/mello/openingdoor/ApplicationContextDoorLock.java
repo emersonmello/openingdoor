@@ -15,7 +15,11 @@ public class ApplicationContextDoorLock extends Application {
     private boolean tryingToAuthenticate = false;
     private boolean handShake = true;
     private String payload = "READY";
+    private int blockSize = 0;
+    private StringBuilder longMessage;
     private static Context sContext;
+    public  static AuthenticationNFCActivity activity = null;
+    public  static MainActivity mainActivity = null;
     private static SharedPreferences sSharedPreferences;
     public static String TAG = "OpeningDoors";
 
@@ -31,6 +35,30 @@ public class ApplicationContextDoorLock extends Application {
             ApplicationContextDoorLock.sSharedPreferences = PreferenceManager.getDefaultSharedPreferences(sContext);
         }
         return instance;
+    }
+
+    public int getBlockSize() {
+        return blockSize;
+    }
+
+    public void setBlockSize(int blockSize) {
+        this.blockSize = blockSize;
+    }
+
+    public int decBlockSize(){
+        return --blockSize;
+    }
+
+    public void clearLongMessage(){
+        this.longMessage = new StringBuilder();
+    }
+
+    public String getLongMessage() {
+        return longMessage.toString();
+    }
+
+    public void appendLongMessage(String longMessage) {
+        this.longMessage.append(longMessage);
     }
 
     public boolean isTryingToAuthenticate() {

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.nfc.cardemulation.HostApduService;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 
 public class MyHostApduService extends HostApduService {
@@ -36,36 +37,76 @@ public class MyHostApduService extends HostApduService {
             Log.d(TAG, "SELECTAIDAPDU");
             mApplicationContextDoorLock.setHandShake(false);
             mProtocolAsyncTask = null;
+            mApplicationContextDoorLock.setBlockSize(0);
+            mApplicationContextDoorLock.clearLongMessage();
             return DoorProtocol.HELLO.getDesc().getBytes();
         } else {
-            Log.d(TAG, "PROTOCOL");
             String message = new String(commandApdu);
-            if ((message.equals(DoorProtocol.READY.getDesc())) && (!mApplicationContextDoorLock.isHandShake())) {
-                if (!mApplicationContextDoorLock.isTryingToAuthenticate()) {
-                    switch (mApplicationContextDoorLock.getPayload()){
-                        case "READY":
-                            Log.d(TAG, "READY");
-                            mApplicationContextDoorLock.setTryingToAuthenticate(true);
-                            mProtocolAsyncTask = new ProtocolAsyncTask(this);
-                            mProtocolAsyncTask.execute(new String(commandApdu));
-                            break;
-                        case "SUCCESS":
-                            Log.d(TAG, "SUCCESS");
-                            mApplicationContextDoorLock.setPayload("READY");
-                            mApplicationContextDoorLock.setHandShake(true);
-                            MyHostApduService.this.sendResponseApdu(DoorProtocol.DONE.getDesc().getBytes());
-                            break;
-                        case "ERROR":
-                            String value = mSharedPreferences.getString(FIDO_KEY," nothing");
-                            Log.d(TAG, "ERROR: " + value);
-                            mApplicationContextDoorLock.setPayload("nil");
-                            mApplicationContextDoorLock.setHandShake(true);
-                            MyHostApduService.this.sendResponseApdu(DoorProtocol.ERROR.getDesc().getBytes());
-                            break;
-                    }
+//            Log.d(TAG, "PROTOCOL: " + message);
+            if (message.contains("BLOCK")) {
+                String size = message.split(":")[1];
+                int i = Integer.parseInt(size);
+                mApplicationContextDoorLock.setBlockSize(i);
+                mApplicationContextDoorLock.clearLongMessage();
+                return "NEXT".getBytes();
+            } else {
+                if (mApplicationContextDoorLock.getBlockSize() > 0) {
+                    mApplicationContextDoorLock.appendLongMessage(message);
+                    mApplicationContextDoorLock.decBlockSize();
+                    return "CONT".getBytes();
                 } else {
-                    Log.d(TAG, "WAIT");
-                    MyHostApduService.this.sendResponseApdu(DoorProtocol.WAIT.getDesc().getBytes());
+                    if ((message.equals(DoorProtocol.READY.getDesc())
+                            || message.equals("RESPONSE")
+                            || message.equals(DoorProtocol.GRANTED.getDesc()))
+                            && !mApplicationContextDoorLock.isHandShake()) {
+
+                        if (message.equals(DoorProtocol.GRANTED.getDesc())) {
+                            mApplicationContextDoorLock.setPayload("GRANTED");
+                        }
+
+                        if (!mApplicationContextDoorLock.isTryingToAuthenticate()) {
+                            switch (mApplicationContextDoorLock.getPayload()) {
+                                case "READY":
+                                    Log.d(TAG, "READY");
+                                    mApplicationContextDoorLock.setTryingToAuthenticate(true);
+                                    mProtocolAsyncTask = new ProtocolAsyncTask(this);
+                                    mProtocolAsyncTask.execute(mApplicationContextDoorLock.getLongMessage());
+                                    mApplicationContextDoorLock.clearLongMessage();
+                                    break;
+                                case "SUCCESS":
+                                    Log.d(TAG, "SUCCESS");
+                                    mApplicationContextDoorLock.setPayload("RESPONSE");
+                                    mApplicationContextDoorLock.setTryingToAuthenticate(false);
+                                    MyHostApduService.this.sendResponseApdu(DoorProtocol.DONE.getDesc().getBytes());
+                                    break;
+                                case "ERROR":
+                                    String value = mSharedPreferences.getString(FIDO_KEY, " nothing");
+                                    Log.d(TAG, "ERROR: " + value);
+                                    mApplicationContextDoorLock.setPayload("nil");
+                                    mApplicationContextDoorLock.setHandShake(true);
+                                    MyHostApduService.this.sendResponseApdu(DoorProtocol.ERROR.getDesc().getBytes());
+                                    onDeactivated(-1);
+                                    break;
+                                case "RESPONSE":
+                                    String response = mApplicationContextDoorLock.getLongMessage();
+                                    Log.d(TAG, "RESPONSE: " + response);
+                                    mApplicationContextDoorLock.setPayload("nil");
+                                    MyHostApduService.this.sendResponseApdu(response.getBytes());
+                                    break;
+                                case "GRANTED":
+                                    Log.d(TAG, "Access granted");
+                                    mApplicationContextDoorLock.setHandShake(true);
+//                                    if (ApplicationContextDoorLock.activity != null){
+                                    ApplicationContextDoorLock.activity.animation();
+                                    //                                  }
+                                    MyHostApduService.this.sendResponseApdu("BYE".getBytes());
+                                    break;
+                            }
+                        } else {
+                            Log.d(TAG, "WAIT");
+                            MyHostApduService.this.sendResponseApdu(DoorProtocol.WAIT.getDesc().getBytes());
+                        }
+                    }
                 }
             }
             return null;
@@ -77,6 +118,9 @@ public class MyHostApduService extends HostApduService {
         Log.d(TAG, "Deactivated: " + reason);
         mApplicationContextDoorLock.setTryingToAuthenticate(false);
         mApplicationContextDoorLock.setPayload("READY");
+        mApplicationContextDoorLock.setHandShake(true);
+        mApplicationContextDoorLock.clearLongMessage();
+        mApplicationContextDoorLock.setBlockSize(0);
         this.isDone = true;
         this.mProtocolAsyncTask = null;
     }
@@ -97,15 +141,14 @@ public class MyHostApduService extends HostApduService {
         @Override
         protected String doInBackground(String... params) {
             String message = params[0];
-            if (message.equals(DoorProtocol.READY.getDesc())) {
-                Bundle data = new Bundle();
-                data.putBoolean("NFC",true);
-                Intent intent = new Intent(this.myHostApduService, AuthenticationActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                intent.putExtras(data);
-                startActivity(intent);
-            }
+            Bundle data = new Bundle();
+            data.putBoolean("NFC", true);
+            data.putString("uafMsg", message);
+            Intent intent = new Intent(this.myHostApduService, AuthenticationNFCActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtras(data);
+            startActivity(intent);
             return DoorProtocol.WAIT.getDesc();
         }
 
@@ -118,6 +161,4 @@ public class MyHostApduService extends HostApduService {
             mProtocolAsyncTask = null;
         }
     }
-
-
 }

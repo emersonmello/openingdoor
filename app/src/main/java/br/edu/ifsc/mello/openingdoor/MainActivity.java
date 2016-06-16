@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         PreferenceManager.setDefaultValues(ApplicationContextDoorLock.getContext(), R.xml.pref_general, false);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(ApplicationContextDoorLock.getContext());
         mApplicationContextDoorLock = ApplicationContextDoorLock.getInstance();
+        ApplicationContextDoorLock.mainActivity = this;
         init();
     }
 
