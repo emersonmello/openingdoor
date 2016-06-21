@@ -72,8 +72,6 @@ public class AuthenticationActivity extends BaseActivity {
     }
 
     public void finishProcessing(String result) {
-        mApplicationContextDoorLock.setPayload("SUCCESS");
-        mApplicationContextDoorLock.setTryingToAuthenticate(false);
         if (result != null) {
             if (!nfc) {
                 Bundle extras = new Bundle();
@@ -84,9 +82,6 @@ public class AuthenticationActivity extends BaseActivity {
             }
         } else {
             Toast.makeText(getApplicationContext(), "Something is wrong!", Toast.LENGTH_SHORT).show();
-            mApplicationContextDoorLock.setPayload("ERROR");
-            mApplicationContextDoorLock.setTryingToAuthenticate(false);
-            addSharedPrefs(FIDO_KEY, "Something is wrong!");
         }
         finish();
     }
@@ -129,9 +124,6 @@ public class AuthenticationActivity extends BaseActivity {
         mAuthTask = null;
         mUserResponseAsyncTask = null;
         showProgress(false);
-        mApplicationContextDoorLock.setPayload("ERROR");
-        mApplicationContextDoorLock.setTryingToAuthenticate(false);
-        addSharedPrefs(FIDO_KEY, errorMsg);
         Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT).show();
         finish();
     }
@@ -186,16 +178,10 @@ public class AuthenticationActivity extends BaseActivity {
                     sendUafClientIntent(intent, FidoOpCommsType.Return);
                 } catch (UafProcessingException e) {
                     Toast.makeText(mAuthenticationActivity.getApplicationContext(), R.string.no_fido_client_found, Toast.LENGTH_LONG).show();
-                    mApplicationContextDoorLock.setPayload("ERROR");
-                    mApplicationContextDoorLock.setTryingToAuthenticate(false);
-                    addSharedPrefs(FIDO_KEY, "no fido client found");
                     finish();
                 }
             } else {
                 Toast.makeText(mAuthenticationActivity.getApplicationContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
-                mApplicationContextDoorLock.setPayload("ERROR");
-                mApplicationContextDoorLock.setTryingToAuthenticate(false);
-                addSharedPrefs(FIDO_KEY, "connection error");
                 finish();
             }
         }
@@ -203,9 +189,6 @@ public class AuthenticationActivity extends BaseActivity {
         @Override
         protected void onCancelled() {
             mAuthTask = null;
-            mApplicationContextDoorLock.setPayload("ERROR");
-            mApplicationContextDoorLock.setTryingToAuthenticate(false);
-            addSharedPrefs(FIDO_KEY,"canceled");
             showProgress(false);
         }
     }
@@ -253,10 +236,6 @@ public class AuthenticationActivity extends BaseActivity {
             super.onCancelled();
             showProgress(false);
             mUserResponseAsyncTask = null;
-            mApplicationContextDoorLock.setPayload("ERROR");
-            mApplicationContextDoorLock.setTryingToAuthenticate(false);
-            addSharedPrefs(FIDO_KEY, "canceled");
-
         }
     }
 

@@ -13,14 +13,27 @@ public enum DoorProtocol {
     READER_ERROR((short) 7, "READER_ERROR"),
     DENY((short) 8, "DENY"),
     BYE((short) 9, "BYE"),
-    NEXT((short) 10, "NEXT");
+    NEXT((short) 10, "NEXT"),
+    OK((short) 11, "OK"),
+    SUCCESS((short) 12, "SUCCESS"),
+    RESPONSE((short) 13, "RESPONSE"),
+    RESULT((short) 14, "RESULT");
 
     private final short id;
     private final String desc;
 
-    DoorProtocol(final short id, final String desc){
+    DoorProtocol(final short id, final String desc) {
         this.id = id;
         this.desc = desc;
+    }
+
+    public static DoorProtocol byValue(String val) {
+        for (DoorProtocol en : values()) {
+            if (en.desc.equals(val)) {
+                return en;
+            }
+        }
+        throw new IllegalArgumentException("Invalid uaf intent type description: " + val);
     }
 
     public short getId() {
