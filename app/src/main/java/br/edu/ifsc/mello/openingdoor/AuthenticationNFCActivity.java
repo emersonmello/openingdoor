@@ -83,22 +83,16 @@ public class AuthenticationNFCActivity extends BaseActivity {
         mApplicationContextDoorLock.fidoClientResponse = uafResponseJson;
         mApplicationContextDoorLock.fidoClientWorking = false;
         Log.d("process", "fido uaf client sent response");
-//        if (problem){
-//            problem = false;
-//            finish();
-//        }
-//        new CountDownTimer(5000, 100) {
-//            public void onTick(long millisUntilFinished) {
-//            }
-//
-//            public void onFinish() {
-//                if (mApplicationContextDoorLock.getPayload().equals("RESPONSE")){
-//                    Log.d("process", "timeout");
-////                    mApplicationContextDoorLock.resetting();
-//                    finish();
-//                }
-//            }
-//        }.start();
+        this.countDownTimer = new CountDownTimer(6000, 100) {
+            public void onTick(long millisUntilFinished) {
+            }
+            public void onFinish() {
+                Log.d("uafError", "Activity timeout.");
+                mApplicationContextDoorLock.fidoClientResponse = "";
+                mApplicationContextDoorLock.protocolStep = ERROR;
+                finish();
+            }
+        }.start();
     }
 
     public void animation(boolean accessGranted) {
@@ -111,6 +105,8 @@ public class AuthenticationNFCActivity extends BaseActivity {
             textView.setText("Access denied");
         }
         textView.setVisibility(View.VISIBLE);
+        assert countDownTimer != null;
+        this.countDownTimer.cancel();
         this.countDownTimer = new CountDownTimer(10000, 100) {
             public void onTick(long millisUntilFinished) {
             }
