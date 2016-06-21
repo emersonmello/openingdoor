@@ -60,10 +60,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     // UAF Client Utility class
     private static final IUafClientUtils uafClientUtils = new UafClientUtils();
 
-    // A link to the interface through which communications to the relying party
-    // is routed
-//    private static IRelyingPartyComms relyingPartyComms;
-
 
     /**
      * Initialise global interfaces which are made available to all activities which derive from this class
@@ -72,9 +68,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if(relyingPartyComms==null) {
-//            relyingPartyComms = new RelyingPartyServerComms(this);
-//        }
     }
 
 
@@ -88,7 +81,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_settings:
-//                openSettings();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

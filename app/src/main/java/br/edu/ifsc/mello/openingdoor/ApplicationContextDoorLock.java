@@ -16,7 +16,7 @@ public class ApplicationContextDoorLock extends Application {
     private boolean handShake = true;
     private String payload = "READY";
     private int blockSize = 0;
-    private StringBuilder longMessage;
+    private StringBuilder messageBuffer;
     private static Context sContext;
     public  static AuthenticationNFCActivity activity = null;
     public  static MainActivity mainActivity = null;
@@ -49,16 +49,16 @@ public class ApplicationContextDoorLock extends Application {
         return --blockSize;
     }
 
-    public void clearLongMessage(){
-        this.longMessage = new StringBuilder();
+    public void clearMessageBuffer(){
+        this.messageBuffer = new StringBuilder();
     }
 
-    public String getLongMessage() {
-        return longMessage.toString();
+    public String getMessageBuffer() {
+        return messageBuffer.toString();
     }
 
-    public void appendLongMessage(String longMessage) {
-        this.longMessage.append(longMessage);
+    public void appendMessageBuffer(String longMessage) {
+        this.messageBuffer.append(longMessage);
     }
 
     public boolean isTryingToAuthenticate() {
@@ -90,6 +90,13 @@ public class ApplicationContextDoorLock extends Application {
         this.handShake = handShake;
     }
 
+//    public void resetting(){
+//        setTryingToAuthenticate(false);
+//        setPayload("READY");
+//        setHandShake(true);
+//        clearMessageBuffer();
+//        setBlockSize(0);
+//    }
 
 
 }

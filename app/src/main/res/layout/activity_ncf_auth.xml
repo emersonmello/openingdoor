@@ -19,5 +19,17 @@
         android:id="@+id/img_door"
         />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/status_message"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="Status message"
+        android:visibility="gone"
+        android:textAlignment="center"
+        />
+
 
 </LinearLayout>
