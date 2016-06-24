@@ -14,6 +14,8 @@ public class CardHostApduService extends HostApduService {
     public StringBuilder messageBuilder;
     public ProtocolAsyncTask mProtocolAsyncTask;
     private ApplicationContextDoorLock mApplicationContextDoorLock;
+    private String lastSentMessage;
+    private String lastReceivedMessage;
 
     @Override
     public void onCreate() {
@@ -21,32 +23,53 @@ public class CardHostApduService extends HostApduService {
         blockSize = 0;
         messageBuilder = new StringBuilder();
         mProtocolAsyncTask = null;
+        lastReceivedMessage = "";
+        lastSentMessage = "";
         mApplicationContextDoorLock = ApplicationContextDoorLock.getInstance();
     }
 
     @Override
     public byte[] processCommandApdu(byte[] commandApdu, Bundle extras) {
-
+        String sentMessage = "";
         if (selectAidApdu(commandApdu)) {
             Log.d("process", "SELECT AID APDU");
-            return DoorProtocol.HELLO.getDesc().getBytes();
+            sentMessage = DoorProtocol.HELLO.getDesc();
+            return sentMessage.getBytes();
         } else {
             String receivedMessage = new String(commandApdu);
+
+            // ******************************************
+            // DEBUG purpose only
+            if (!lastReceivedMessage.equals(receivedMessage)) {
+                Log.d("REC", "Message received: " + receivedMessage);
+                lastReceivedMessage = receivedMessage;
+            }
+
+            if (!lastSentMessage.equals(sentMessage)) {
+                Log.d("SENT", "Message sent: " + sentMessage);
+                lastSentMessage = sentMessage;
+            }
+
+            // ******************************************
+
 
             if (receivedMessage.contains("BLOCK")) {
                 try {
                     String size = receivedMessage.split(":")[1];
                     blockSize = Integer.parseInt(size);
-                    return DoorProtocol.NEXT.getDesc().getBytes();
+                    sentMessage = DoorProtocol.NEXT.getDesc();
+                    return sentMessage.getBytes();
                 } catch (Exception e) {
-                    return ERROR.getDesc().getBytes();
+                    sentMessage = ERROR.getDesc();
+                    return sentMessage.getBytes();
                 }
             }
 
             if (blockSize > 0) {
                 messageBuilder.append(receivedMessage);
                 blockSize--;
-                return OK.getDesc().getBytes();
+                sentMessage = OK.getDesc();
+                return sentMessage.getBytes();
             }
 
             if (receivedMessage.equals(READY.getDesc())) {
@@ -57,10 +80,12 @@ public class CardHostApduService extends HostApduService {
                 } else {
                     if (mApplicationContextDoorLock.protocolStep == SUCCESS) {
                         mApplicationContextDoorLock.protocolStep = RESPONSE;
-                        return DONE.getDesc().getBytes();
+                        sentMessage = DONE.getDesc();
+                        return sentMessage.getBytes();
                     }
                     if (mApplicationContextDoorLock.protocolStep == ERROR) {
-                        return ERROR.getDesc().getBytes();
+                        sentMessage = ERROR.getDesc();
+                        return sentMessage.getBytes();
                     }
                 }
                 return WAIT.getDesc().getBytes();
@@ -68,20 +93,24 @@ public class CardHostApduService extends HostApduService {
             if (receivedMessage.equals(RESPONSE.getDesc())) {
                 if (mApplicationContextDoorLock.protocolStep == RESPONSE) {
                     mApplicationContextDoorLock.protocolStep = RESULT;
-                    return mApplicationContextDoorLock.fidoClientResponse.getBytes();
+                    sentMessage = mApplicationContextDoorLock.fidoClientResponse;
+                    return sentMessage.getBytes();
                 }
             }
             if ((mApplicationContextDoorLock.protocolStep == RESULT)) {
                 if (receivedMessage.equals(GRANTED.getDesc())) {
                     ApplicationContextDoorLock.activity.animation(true);
-                    return BYE.getDesc().getBytes();
+                    sentMessage = BYE.getDesc();
+                    return sentMessage.getBytes();
                 }
                 if (receivedMessage.equals(DENY.getDesc())) {
                     ApplicationContextDoorLock.activity.animation(false);
-                    return BYE.getDesc().getBytes();
+                    sentMessage = BYE.getDesc();
+                    return sentMessage.getBytes();
                 }
             }
-            return new byte[0];
+            sentMessage = "";
+            return sentMessage.getBytes();
         }//else - main block
     }
 

@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.daon.identityx.uaf.FidoOperation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final int REG = 1;
     private final int AUTH = 2;
+    private final int DEREG = 3;
     private SharedPreferences mSharedPreferences;
     private ApplicationContextDoorLock mApplicationContextDoorLock;
 
@@ -59,6 +61,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void deregisterAuthenticator(View view) {
+        //dereg();
+       Intent intent = new Intent(this, DeRegisterActivity.class);
+       startActivityForResult(intent, DEREG);
+    }
 
     public void createAccount(View view) {
         Intent intent = new Intent(this, RegisterActivity.class);
@@ -70,9 +77,10 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, AUTH);
     }
 
-    public void dereg(View view) {
+    public void dereg() {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.remove("usernameMain");
+        editor.remove("aaid");
         editor.remove("keyid");
         editor.remove("pubkey");
         editor.remove("server");
@@ -94,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = mSharedPreferences.edit();
             editor.putString("usernameMain", serverResponseReg.getUsername());
             editor.putString("keyid", serverResponseReg.getAuthenticator().getKeyID());
+            editor.putString("aaid", serverResponseReg.getAuthenticator().getAAID());
             editor.putString("pubkey", serverResponseReg.getPublicKey());
             editor.putString("server", mSharedPreferences.getString("fido_server_endpoint", ""));
             editor.apply();
@@ -164,6 +173,12 @@ public class MainActivity extends AppCompatActivity {
                         // **************************************************
                     } else {
                         Toast.makeText(this, "Something is wrong", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case DEREG:
+                    result = extra.getString("result");
+                    if (!result.isEmpty()) {
+                        dereg();
                     }
                     break;
             }

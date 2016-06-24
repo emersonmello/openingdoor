@@ -20,15 +20,10 @@ import org.json.JSONObject;
 
 public class AuthenticationActivity extends BaseActivity {
 
-
     private View mProgressView;
     private UserAuthenticationTask mAuthTask = null;
     private UserResponseAsyncTask mUserResponseAsyncTask = null;
     private SharedPreferences mSharedPreferences;
-    private ApplicationContextDoorLock mApplicationContextDoorLock = ApplicationContextDoorLock.getInstance();
-    private boolean nfc;
-    private final String FIDO_KEY = "fido_result";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,13 +31,13 @@ public class AuthenticationActivity extends BaseActivity {
         setContentView(R.layout.activity_authentication);
         mProgressView = findViewById(R.id.auth_progress);
         mSharedPreferences = ApplicationContextDoorLock.getsSharedPreferences();
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        if (extras != null) {
-            nfc = extras.getBoolean("NFC", false);
+        String username = mSharedPreferences.getString("usernameMain", "");
+        if (!username.isEmpty()) {
+            this.attemptAuth();
+        } else {
+            Toast.makeText(this, "You need to register an authenticator first", Toast.LENGTH_SHORT).show();
+            finish();
         }
-        this.attemptAuth();
-
     }
 
     private void attemptAuth() {
@@ -73,13 +68,11 @@ public class AuthenticationActivity extends BaseActivity {
 
     public void finishProcessing(String result) {
         if (result != null) {
-            if (!nfc) {
-                Bundle extras = new Bundle();
-                extras.putString("result", result);
-                Intent intent = new Intent();
-                intent.putExtras(extras);
-                setResult(RESULT_OK, intent);
-            }
+            Bundle extras = new Bundle();
+            extras.putString("result", result);
+            Intent intent = new Intent();
+            intent.putExtras(extras);
+            setResult(RESULT_OK, intent);
         } else {
             Toast.makeText(getApplicationContext(), "Something is wrong!", Toast.LENGTH_SHORT).show();
         }
@@ -111,12 +104,6 @@ public class AuthenticationActivity extends BaseActivity {
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
         }
-    }
-
-    private void addSharedPrefs(String key, String value) {
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(key, value);
-        editor.apply();
     }
 
     @Override
