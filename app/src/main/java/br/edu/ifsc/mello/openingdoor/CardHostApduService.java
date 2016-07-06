@@ -6,6 +6,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static br.edu.ifsc.mello.openingdoor.DoorProtocol.*;
 
 public class CardHostApduService extends HostApduService {
@@ -16,6 +19,8 @@ public class CardHostApduService extends HostApduService {
     private ApplicationContextDoorLock mApplicationContextDoorLock;
     private String lastSentMessage;
     private String lastReceivedMessage;
+    private ArrayList<String> arrayList;
+    private int blockSent;
 
     @Override
     public void onCreate() {
@@ -72,6 +77,15 @@ public class CardHostApduService extends HostApduService {
                 return sentMessage.getBytes();
             }
 
+            if (receivedMessage.equals(NEXT.getDesc())) {
+                Log.d("Block","----> "+ blockSent);
+                if (blockSent < arrayList.size()) {
+                    sentMessage = arrayList.get(blockSent);
+                    blockSent++;
+                    return sentMessage.getBytes();
+                }
+            }
+
             if (receivedMessage.equals(READY.getDesc())) {
                 if (!mApplicationContextDoorLock.fidoClientWorking) {
                     mApplicationContextDoorLock.fidoClientWorking = true;
@@ -94,6 +108,9 @@ public class CardHostApduService extends HostApduService {
                 if (mApplicationContextDoorLock.protocolStep == RESPONSE) {
                     mApplicationContextDoorLock.protocolStep = RESULT;
                     sentMessage = mApplicationContextDoorLock.fidoClientResponse;
+                    this.arrayList = (ArrayList<String>) splitEqually(sentMessage, 259);
+                    this.blockSent = 0;
+                    sentMessage = "BLOCK:" + arrayList.size();
                     return sentMessage.getBytes();
                 }
             }
@@ -112,6 +129,14 @@ public class CardHostApduService extends HostApduService {
             sentMessage = "";
             return sentMessage.getBytes();
         }//else - main block
+    }
+
+    public static List<String> splitEqually(String text, int size) {
+        List<String> ret = new ArrayList<String>((text.length() + size - 1) / size);
+        for (int start = 0; start < text.length(); start += size) {
+            ret.add(text.substring(start, Math.min(text.length(), start + size)));
+        }
+        return ret;
     }
 
 
