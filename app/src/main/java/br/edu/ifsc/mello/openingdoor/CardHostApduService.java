@@ -13,6 +13,7 @@ import static br.edu.ifsc.mello.openingdoor.DoorProtocol.*;
 
 public class CardHostApduService extends HostApduService {
 
+    private final int MAX_FRAME_SIZE = 250;
     private int blockSize;
     public StringBuilder messageBuilder;
     public ProtocolAsyncTask mProtocolAsyncTask;
@@ -85,6 +86,14 @@ public class CardHostApduService extends HostApduService {
                     return sentMessage.getBytes();
                 }
             }
+            if (receivedMessage.equals(ERROR.getDesc())) {
+                Log.d("error", "error on card reader");
+                try {
+                    ApplicationContextDoorLock.activity.animation(false);
+                }catch(Exception e){
+
+                }
+            }
 
             if (receivedMessage.equals(READY.getDesc())) {
                 if (!mApplicationContextDoorLock.fidoClientWorking) {
@@ -108,7 +117,7 @@ public class CardHostApduService extends HostApduService {
                 if (mApplicationContextDoorLock.protocolStep == RESPONSE) {
                     mApplicationContextDoorLock.protocolStep = RESULT;
                     sentMessage = mApplicationContextDoorLock.fidoClientResponse;
-                    this.arrayList = (ArrayList<String>) splitEqually(sentMessage, 259);
+                    this.arrayList = (ArrayList<String>) splitEqually(sentMessage, MAX_FRAME_SIZE);
                     this.blockSent = 0;
                     sentMessage = "BLOCK:" + arrayList.size();
                     return sentMessage.getBytes();
