@@ -14,7 +14,7 @@ Is it possible to use [FIDO UAF Standard](https://fidoalliance.org/specification
 
 This project is a simple prototype to verify how FIDO could be used in this scenario (see [FIDO Security Reference](https://fidoalliance.org/specs/fido-uaf-v1.0-ps-20141208/fido-security-ref-v1.0-ps-20141208.html#threats-to-the-secure-channel-between-client-and-relying-party)). This [card reader](https://github.com/emersonmello/DoorlockCardReader) uses NFC to communicate with a specific [Android Opening Door App](https://github.com/emersonmello/openingdoor), that emulates a NFC card using Android's [Host-based Card Emulation](https://developer.android.com/guide/topics/connectivity/nfc/hce.html) functionality. 
 
-[This application](https://github.com/emersonmello/openingdoor) depend of a third-party, called [FIDO UAF RP Server](https://github.com/emersonmello/UAF).
+[This application](https://github.com/emersonmello/openingdoor) depends of a third-party, called [FIDO UAF RP Server](https://github.com/emersonmello/UAF).
 
 Figure below shows all necessary components and the relation between them
 
