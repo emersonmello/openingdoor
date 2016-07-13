@@ -11,7 +11,7 @@
     <string name="pref_title_account">Enable this user account</string>
     <string name="pref_description_account">This account could be used to open doors</string>
     <string name="pref_title_server_endpoint">Server Endpoint</string>
-    <string name="pref_default_server_endpoint">http://10.66.66.27:8123</string>
+    <string name="pref_default_server_endpoint">http://incident01.ncl.ac.uk:8000</string>
     <string name="pref_title_degreg_op_request">Deregistration Operation Request</string>
     <string name="pref_default_dereg_op_request">/fidouaf/v1/public/deregRequest</string>
     <string name="pref_title_auth_op_response">Authentication Operation Response</string>
