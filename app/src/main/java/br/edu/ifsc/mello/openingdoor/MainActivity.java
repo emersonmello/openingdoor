@@ -3,11 +3,15 @@ package br.edu.ifsc.mello.openingdoor;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +21,9 @@ import android.widget.Toast;
 import com.daon.identityx.uaf.FidoOperation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,8 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void deregisterAuthenticator(View view) {
         //dereg();
-       Intent intent = new Intent(this, DeRegisterActivity.class);
-       startActivityForResult(intent, DEREG);
+        Intent intent = new Intent(this, DeRegisterActivity.class);
+        startActivityForResult(intent, DEREG);
     }
 
     public void createAccount(View view) {
@@ -194,10 +201,40 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
+        switch (id) {
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.action_appsign:
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.app_sign_dialog)
+                        .setMessage(getFacetId())
+                        .setNeutralButton(R.string.button_done, null).show();
+
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public String getFacetId() {
+        StringBuffer ret = new StringBuffer();
+        String comma = "";
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
+            for (Signature sign : packageInfo.signatures) {
+                MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+                messageDigest.update(sign.toByteArray());
+                String currentSignature = Base64.encodeToString(messageDigest.digest(), Base64.DEFAULT);
+                ret.append("android:apk-key-hash:");
+                ret.append(currentSignature.substring(0, currentSignature.length() - 2));
+                ret.append(comma);
+                comma = ",";
+            }
+            return ret.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
