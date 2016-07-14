@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import static br.edu.ifsc.mello.openingdoor.DoorProtocol.HELLO;
+
 /**
  * Created by mello on 31/05/16.
  */
@@ -32,6 +34,12 @@ public class ApplicationContextDoorLock extends Application {
             ApplicationContextDoorLock.sSharedPreferences = PreferenceManager.getDefaultSharedPreferences(sContext);
         }
         return instance;
+    }
+
+    public void cleanup(){
+        fidoClientWorking = false;
+        fidoClientResponse = "";
+        protocolStep = HELLO;
     }
 
     public static Context getContext() {

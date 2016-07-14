@@ -66,7 +66,7 @@ public class AuthenticationNFCActivity extends BaseActivity {
             }
 
             public void onFinish() {
-                finish();
+                finishAndRemoveTask();
             }
         }.start();
     }
@@ -84,8 +84,8 @@ public class AuthenticationNFCActivity extends BaseActivity {
             Toast.makeText(this.getApplicationContext(), R.string.no_fido_client_found, Toast.LENGTH_LONG).show();
             mApplicationContextDoorLock.protocolStep = ERROR;
             mApplicationContextDoorLock.fidoClientResponse = "";
-            mApplicationContextDoorLock.fidoClientWorking = false;
-            finish();
+//            mApplicationContextDoorLock.fidoClientWorking = false;
+            finishAndRemoveTask();
         }
     }
 
@@ -95,7 +95,7 @@ public class AuthenticationNFCActivity extends BaseActivity {
         showProgress(true);
         mApplicationContextDoorLock.protocolStep = SUCCESS;
         mApplicationContextDoorLock.fidoClientResponse = uafResponseJson;
-        mApplicationContextDoorLock.fidoClientWorking = false;
+//        mApplicationContextDoorLock.fidoClientWorking = false;
         Log.d("process", "fido uaf client sent response");
         this.countDownTimer = new CountDownTimer(6000, 100) {
             public void onTick(long millisUntilFinished) {
@@ -106,7 +106,7 @@ public class AuthenticationNFCActivity extends BaseActivity {
                 mApplicationContextDoorLock.fidoClientResponse = "";
                 mApplicationContextDoorLock.protocolStep = ERROR;
                 showProgress(false);
-                finish();
+                finishAndRemoveTask();
             }
         }.start();
     }
@@ -124,13 +124,13 @@ public class AuthenticationNFCActivity extends BaseActivity {
         textView.setVisibility(View.VISIBLE);
         assert countDownTimer != null;
         this.countDownTimer.cancel();
-        this.countDownTimer = new CountDownTimer(10000, 100) {
+        this.countDownTimer = new CountDownTimer(5000, 100) {
             public void onTick(long millisUntilFinished) {
             }
 
             public void onFinish() {
                 Log.d("animation", "timeout");
-                finish();
+                finishAndRemoveTask();
             }
         }.start();
     }
@@ -140,9 +140,8 @@ public class AuthenticationNFCActivity extends BaseActivity {
         showProgress(true);
         mApplicationContextDoorLock.protocolStep = ERROR;
         mApplicationContextDoorLock.fidoClientResponse = "";
-        mApplicationContextDoorLock.fidoClientWorking = false;
         Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT).show();
-        finish();
+        finishAndRemoveTask();
     }
 
     /**

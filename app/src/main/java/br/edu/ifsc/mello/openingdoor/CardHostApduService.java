@@ -51,11 +51,6 @@ public class CardHostApduService extends HostApduService {
                 lastReceivedMessage = receivedMessage;
             }
 
-            if (!lastSentMessage.equals(sentMessage)) {
-                Log.d("SENT", "Message sent: " + sentMessage);
-                lastSentMessage = sentMessage;
-            }
-
             // ******************************************
 
 
@@ -64,9 +59,11 @@ public class CardHostApduService extends HostApduService {
                     String size = receivedMessage.split(":")[1];
                     blockSize = Integer.parseInt(size);
                     sentMessage = DoorProtocol.NEXT.getDesc();
+                    Log.d("SENT", "Message sent: " + sentMessage);
                     return sentMessage.getBytes();
                 } catch (Exception e) {
                     sentMessage = ERROR.getDesc();
+                    Log.d("SENT", "Message sent: " + sentMessage);
                     return sentMessage.getBytes();
                 }
             }
@@ -75,6 +72,7 @@ public class CardHostApduService extends HostApduService {
                 messageBuilder.append(receivedMessage);
                 blockSize--;
                 sentMessage = OK.getDesc();
+                Log.d("SENT", "Message sent: " + sentMessage);
                 return sentMessage.getBytes();
             }
 
@@ -103,11 +101,15 @@ public class CardHostApduService extends HostApduService {
                 } else {
                     if (mApplicationContextDoorLock.protocolStep == SUCCESS) {
                         mApplicationContextDoorLock.protocolStep = RESPONSE;
+                        mApplicationContextDoorLock.fidoClientWorking = false;
                         sentMessage = DONE.getDesc();
+                        Log.d("SENT", "Message sent: " + sentMessage);
                         return sentMessage.getBytes();
                     }
                     if (mApplicationContextDoorLock.protocolStep == ERROR) {
                         sentMessage = ERROR.getDesc();
+                        mApplicationContextDoorLock.cleanup();
+                        Log.d("SENT", "Message sent: " + sentMessage);
                         return sentMessage.getBytes();
                     }
                 }
@@ -120,6 +122,7 @@ public class CardHostApduService extends HostApduService {
                     this.arrayList = (ArrayList<String>) splitEqually(sentMessage, MAX_FRAME_SIZE);
                     this.blockSent = 0;
                     sentMessage = "BLOCK:" + arrayList.size();
+                    Log.d("SENT", "Message sent: " + sentMessage);
                     return sentMessage.getBytes();
                 }
             }
@@ -127,11 +130,13 @@ public class CardHostApduService extends HostApduService {
                 if (receivedMessage.equals(GRANTED.getDesc())) {
                     ApplicationContextDoorLock.activity.animation(true);
                     sentMessage = BYE.getDesc();
+                    Log.d("SENT", "Message sent: " + sentMessage);
                     return sentMessage.getBytes();
                 }
                 if (receivedMessage.equals(DENY.getDesc())) {
                     ApplicationContextDoorLock.activity.animation(false);
                     sentMessage = BYE.getDesc();
+                    Log.d("SENT", "Message sent: " + sentMessage);
                     return sentMessage.getBytes();
                 }
             }
@@ -182,9 +187,7 @@ public class CardHostApduService extends HostApduService {
         blockSize = 0;
         messageBuilder = new StringBuilder();
         mProtocolAsyncTask = null;
-        mApplicationContextDoorLock.fidoClientWorking = false;
-        mApplicationContextDoorLock.fidoClientResponse = "";
-        mApplicationContextDoorLock.protocolStep = HELLO;
+        mApplicationContextDoorLock.cleanup();
     }
 
     @Override

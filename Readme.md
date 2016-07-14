@@ -2,6 +2,9 @@
 
 A simple application to demonstrate how to use FIDO UAF protocol and NFC on physical access control
 
+- This client got some codes from [Daon Inc. Sample FIDO UAF App](https://github.com/daoninc/fido-android-rp-app), [eBay UAF open source project](https://github.com/eBay/UAF) and [Android Google Samples](https://github.com/googlesamples/android-AsymmetricFingerprintDialog)
+
+
 **You can use this application without a [card reader](https://github.com/emersonmello/DoorlockCardReader)** if you only want to do tests about FIDO UAF Protocol. This application provides UI buttons that allow you to:
 
 - Register a key at a [FIDO UAF Demo Server](https://github.com/emersonmello/UAF)
