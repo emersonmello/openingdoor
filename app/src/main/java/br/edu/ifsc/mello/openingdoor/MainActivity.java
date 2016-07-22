@@ -1,6 +1,7 @@
 package br.edu.ifsc.mello.openingdoor;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -18,12 +19,9 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.daon.identityx.uaf.FidoOperation;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -75,8 +73,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createAccount(View view) {
-        Intent intent = new Intent(this, RegisterActivity.class);
-        startActivityForResult(intent, REG);
+        String username = mSharedPreferences.getString("username", "");
+
+        if (username.isEmpty()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.emptyusername)
+                    .setMessage(R.string.emptyusernamemessage)
+                    .setPositiveButton(R.string.button_go_to_settings, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                        }
+                    }).show();
+        }else {
+            Intent intent = new Intent(this, RegisterActivity.class);
+            startActivityForResult(intent, REG);
+        }
     }
 
     public void authentication(View view) {

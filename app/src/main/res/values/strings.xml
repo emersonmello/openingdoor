@@ -6,7 +6,7 @@
     <!-- Strings related to Settings -->
     <string name="pref_header_general">General</string>
     <string name="pref_title_display_name">Username</string>
-    <string name="pref_default_display_name">johndoe</string>
+    <string name="pref_default_display_name"></string>
 
     <string name="pref_title_account">Enable this user account</string>
     <string name="pref_description_account">This account could be used to open doors</string>
@@ -46,5 +46,8 @@
     <string name="server_label">Endpoint:</string>
     <string name="action_sign">See app facetID</string>
     <string name="app_sign_dialog">Your application facetID</string>
+    <string name="button_go_to_settings">Go to Settings</string>
+    <string name="emptyusername">Username is empty</string>
+    <string name="emptyusernamemessage">You need to define a username.</string>
 
 </resources>

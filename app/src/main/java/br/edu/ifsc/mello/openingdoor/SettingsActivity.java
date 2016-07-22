@@ -3,7 +3,6 @@ package br.edu.ifsc.mello.openingdoor;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -46,6 +45,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
             preference.setSummary(stringValue);
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ApplicationContextDoorLock.getContext());
+            String username = sharedPreferences.getString("usernameMain", "");
+            boolean enable = (username.isEmpty()) ? true : false;
+
+            preference.setEnabled(enable);
             return true;
         }
     };
