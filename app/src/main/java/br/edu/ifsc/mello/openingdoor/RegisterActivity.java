@@ -86,6 +86,7 @@ public class RegisterActivity extends BaseActivity {
     protected void onActivityResultFailure(String errorMsg) {
         createAccountTask = null;
         showProgress(false);
+        Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT).show();
         finish();
     }
 

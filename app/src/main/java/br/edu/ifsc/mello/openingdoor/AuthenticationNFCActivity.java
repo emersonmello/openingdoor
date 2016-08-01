@@ -33,6 +33,7 @@ public class AuthenticationNFCActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ncf_auth);
         mProgressView = (ProgressBar) findViewById(R.id.auth_nfc_progress);
+        mApplicationContextDoorLock.cleanup();
 
         mSharedPreferences = ApplicationContextDoorLock.getsSharedPreferences();
         String username = mSharedPreferences.getString("usernameMain", "");
@@ -66,6 +67,7 @@ public class AuthenticationNFCActivity extends BaseActivity {
             }
 
             public void onFinish() {
+                mApplicationContextDoorLock.cleanup();
                 finishAndRemoveTask();
             }
         }.start();
@@ -84,7 +86,7 @@ public class AuthenticationNFCActivity extends BaseActivity {
             Toast.makeText(this.getApplicationContext(), R.string.no_fido_client_found, Toast.LENGTH_LONG).show();
             mApplicationContextDoorLock.protocolStep = ERROR;
             mApplicationContextDoorLock.fidoClientResponse = "";
-//            mApplicationContextDoorLock.fidoClientWorking = false;
+            mApplicationContextDoorLock.cleanup();
             finishAndRemoveTask();
         }
     }
@@ -106,6 +108,7 @@ public class AuthenticationNFCActivity extends BaseActivity {
                 mApplicationContextDoorLock.fidoClientResponse = "";
                 mApplicationContextDoorLock.protocolStep = ERROR;
                 showProgress(false);
+                mApplicationContextDoorLock.cleanup();
                 finishAndRemoveTask();
             }
         }.start();
@@ -130,6 +133,7 @@ public class AuthenticationNFCActivity extends BaseActivity {
 
             public void onFinish() {
                 Log.d("animation", "timeout");
+                mApplicationContextDoorLock.cleanup();
                 finishAndRemoveTask();
             }
         }.start();
@@ -141,6 +145,7 @@ public class AuthenticationNFCActivity extends BaseActivity {
         mApplicationContextDoorLock.protocolStep = ERROR;
         mApplicationContextDoorLock.fidoClientResponse = "";
         Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT).show();
+        mApplicationContextDoorLock.cleanup();
         finishAndRemoveTask();
     }
 

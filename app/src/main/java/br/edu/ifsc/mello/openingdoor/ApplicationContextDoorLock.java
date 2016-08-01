@@ -17,9 +17,9 @@ public class ApplicationContextDoorLock extends Application {
     private static Context sContext;
     public static AuthenticationNFCActivity activity = null;
     private static SharedPreferences sSharedPreferences;
-    public DoorProtocol protocolStep;
-    public boolean fidoClientWorking;
-    public String fidoClientResponse;
+    public DoorProtocol protocolStep = HELLO;
+    public boolean fidoClientWorking = false;
+    public String fidoClientResponse = "";
 
     @Override
     public void onCreate() {
