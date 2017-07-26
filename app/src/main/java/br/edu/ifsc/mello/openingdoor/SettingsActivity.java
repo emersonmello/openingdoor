@@ -163,6 +163,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("fido_auth_request"));
             bindPreferenceSummaryToValue(findPreference("fido_auth_response"));
             bindPreferenceSummaryToValue(findPreference("fido_dereg_request"));
+            bindPreferenceSummaryToValue(findPreference("fido_whitelisting_uuid"));
+            bindPreferenceSummaryToValue(findPreference("fido_whitelisting_facetid"));
         }
     }
 }

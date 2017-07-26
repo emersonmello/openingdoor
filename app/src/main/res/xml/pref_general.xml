@@ -60,6 +60,24 @@
         android:selectAllOnFocus="true"
         android:singleLine="true"
         android:title="@string/pref_title_degreg_op_request" />
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_whitelisting_uuid"
+        android:inputType="textUri"
+        android:key="fido_whitelisting_uuid"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_whitelisting_uuid" />
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_whitelisting_facetid"
+        android:inputType="textUri"
+        android:key="fido_whitelisting_facetid"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_whitelisting_facetid" />
+
+
     <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
          dismiss it. -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->

@@ -11,7 +11,7 @@
     <string name="pref_title_account">Enable this user account</string>
     <string name="pref_description_account">This account could be used to open doors</string>
     <string name="pref_title_server_endpoint">Server Endpoint</string>
-    <string name="pref_default_server_endpoint">http://incident01.ncl.ac.uk:8000</string>
+    <string name="pref_default_server_endpoint">http://www.head2toes.org</string>
     <string name="pref_title_degreg_op_request">Deregistration Operation Request</string>
     <string name="pref_default_dereg_op_request">/fidouaf/v1/public/deregRequest</string>
     <string name="pref_title_auth_op_response">Authentication Operation Response</string>
@@ -22,6 +22,11 @@
     <string name="pref_default_reg_op_response">/fidouaf/v1/public/regResponse</string>
     <string name="pref_title_reg_op_request">Registration Operation Request</string>
     <string name="pref_default_reg_op_request">/fidouaf/v1/public/regRequest</string>
+    <string name="pref_title_whitelisting_uuid">Whitelisting the UUID</string>
+    <string name="pref_default_whitelisting_uuid">/fidouaf/v1/whitelistuuid/</string>
+    <string name="pref_title_whitelisting_facetid">Whitelisting the Facet Id</string>
+    <string name="pref_default_whitelisting_facetid">/fidouaf/v1/whitelistfacetid/</string>
+
 
     <string name="registerAuthenticatorMessage">Register</string>
     <string name="statusMessage">FIDO UAF Client is not registered yet.</string>
@@ -29,15 +34,18 @@
     <string name="servicedescription">Service card reader</string>
     <string name="aiddescription">aiddescription</string>
 
-    <!--error strings-->
+
     <string name="alert_error_title">Something is wrong</string>
     <string name="no_fido_client_found">No FIDO UAF Client was found.</string>
     <string name="operation_cancelled">The FIDO operation was cancelled.</string>
     <string name="activity_result_error">Unexpected activity result code: </string>
     <string name="internal_server_error">Internal Server Error</string>
     <string name="connection_error">The server is not reachable</string>
+    <string name="whitelisting_error">Something is wrong when trying to whitelisting</string>
+    <string name="whitelisting_ok">Successful</string>
     <string name="button_done">Done</string>
     <string name="action_reset">Reset</string>
+    <string name="action_whitelisting_facetid">Whitelisting facetID</string>
     <string name="username_label">Username:</string>
     <string name="keyid_label">KeyId:</string>
     <string name="pubkey_label">PubKey:</string>

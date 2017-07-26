@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
@@ -18,8 +19,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.gson.Gson;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 
 
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private final int AUTH = 2;
     private final int DEREG = 3;
     private SharedPreferences mSharedPreferences;
+    private WhitelistingTask mWhiteListingTask;
     private ApplicationContextDoorLock mApplicationContextDoorLock;
 
     @Override
@@ -224,6 +228,10 @@ public class MainActivity extends AppCompatActivity {
                         .setNeutralButton(R.string.button_done, null).show();
 
                 break;
+            case R.id.action_whitelisting_facetid:
+                // Developing purpose only, it should not be used in a real scenario.
+                this.attemptWhitelistings();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -253,5 +261,89 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         this.init();
+    }
+
+
+
+    /**
+     * Whitelisting facetID of this Android RP APP. Certified FIDO Client should
+     * only trusts on Android RP App registered at FIDO UAF Server
+     *
+     * It only works with FIDO UAF Demo Server (https://github.com/emersonmello/UAF or https://github.com/eBay/UAF)
+     *
+     * Developing purpose only, it should not be used in a real scenario.
+     *
+     */
+    private void attemptWhitelistings() {
+        if (mWhiteListingTask != null) {
+            return;
+        }
+        mWhiteListingTask = new MainActivity.WhitelistingTask(this);
+        String url = mSharedPreferences.getString("fido_server_endpoint", "") + mSharedPreferences.getString("fido_whitelisting_facetid", "");
+        String facetId = null;
+        try {
+            facetId = URLEncoder.encode(this.getFacetId(),"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        mWhiteListingTask.execute(url + facetId);
+    }
+
+
+    /**
+     * Represents an asynchronous task used to whitelisting facetID. Developing purpose only, it should not be used in a real scenario.
+     */
+    public class WhitelistingTask extends AsyncTask<String, Integer, String> {
+
+        private String result;
+        private boolean done;
+        private MainActivity mMainActivity;
+
+        public WhitelistingTask(MainActivity mainActivity) {
+            mMainActivity = mainActivity;
+            result = null;
+            done = false;
+        }
+
+        public boolean isDone() {
+            return done;
+        }
+
+        public String getResult() {
+            return result;
+        }
+
+        @Override
+        protected String doInBackground(String... args) {
+            done = true;
+            try {
+                result = HttpUtils.get(args[0]).getPayload();
+            } catch (Exception e) {
+                return "";
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != "") {
+                mWhiteListingTask = null;
+                this.result = result;
+                this.done = true;
+
+                if (result.contains(mMainActivity.getFacetId())){
+                    Toast.makeText(mMainActivity.getApplicationContext(), R.string.whitelisting_ok, Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(mMainActivity.getApplicationContext(), R.string.whitelisting_error, Toast.LENGTH_LONG).show();
+                }
+            } else {
+                Toast.makeText(mMainActivity.getApplicationContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mWhiteListingTask = null;
+        }
     }
 }

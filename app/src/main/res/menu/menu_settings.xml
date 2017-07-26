@@ -8,4 +8,5 @@
         android:orderInCategory="100"
         android:title="@string/action_reset"
         app:showAsAction="always" />
+
 </menu>
