@@ -121,9 +121,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             if (!username.isEmpty()){
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("usernameMain", username);
-                editor.putString("keyid", keyid);
-                editor.putString("pubkey", pubkey);
+                editor.putString("usernameMain", "");
+                editor.putString("keyid", "");
+                editor.putString("pubkey", "");
                 editor.apply();
             }
 

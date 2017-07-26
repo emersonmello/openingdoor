@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void deregisterAuthenticator(View view) {
-        //dereg();
         Intent intent = new Intent(this, DeRegisterActivity.class);
         startActivityForResult(intent, DEREG);
     }
@@ -248,5 +247,11 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.init();
     }
 }
