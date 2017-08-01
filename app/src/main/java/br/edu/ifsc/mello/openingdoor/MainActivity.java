@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
      * Whitelisting facetID of this Android RP APP. Certified FIDO Client should
      * only trusts on Android RP App registered at FIDO UAF Server
      *
-     * It only works with FIDO UAF Demo Server (https://github.com/emersonmello/UAF or https://github.com/eBay/UAF)
+     * It only works with FIDO UAF Demo Server (https://github.com/emersonmello/UAF or https://github.com/emersonmello/docker-fidouafserver)
      *
      * Developing purpose only, it should not be used in a real scenario.
      *
