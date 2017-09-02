@@ -26,8 +26,8 @@ Figure below shows all necessary components and the relation between them
 ## Requirements
 
 1. One Android mobile phone (with NFC) to acts like a card (Android OS >= 6 + Fingerprint sensor)
-1. [Dummy FIDO UAF Client](https://github.com/emersonmello/dummyuafclient) installed on the same mobile phone 
-1. One computer to host FIDO UAF Demo Server
+2. [Dummy FIDO UAF Client](https://github.com/emersonmello/dummyuafclient) installed on the same mobile phone 
+3. One computer to host FIDO UAF Demo Server
 
 ### Optional
 
@@ -37,8 +37,8 @@ Figure below shows all necessary components and the relation between them
 
 1. [FIDO UAF Demo Server](https://github.com/emersonmello/UAF)
   - If you prefer, there is a [Docker container](https://www.docker.com/what-docker) ready to use here: https://github.com/emersonmello/docker-fidouafserver
-1. [Dummy FIDO UAF Client](https://github.com/emersonmello/dummyuafclient)
-1. [Opening Door Android App](https://github.com/emersonmello/openingdoor) - You are already here!
+2. [Dummy FIDO UAF Client](https://github.com/emersonmello/dummyuafclient)
+3. [Opening Door Android App](https://github.com/emersonmello/openingdoor) - You are already here!
 
 ### Optional
 
@@ -47,22 +47,22 @@ Figure below shows all necessary components and the relation between them
 ## Setting up
 
 1. Start **FIDO UAF Demo Server**
-1. Install **Dummy FIDO UAF Client** and **Opening Door Android App** on your another Android phone
-1. On **Opening Door Android App** touch on "Settings" on the main application menu and update "server endpoint" field to the **IP Address** and **PORT** where you are running the **FIDO UAF Demo Server**  
-1. On **Opening Door Android App** touch on "See app facetID" on the main application menu and insert the showed value in FIDO UAF Demo Server MySQL database:
-  - For instance: ```INSERT  INTO facets (fDesc) values ('android:apk-key-hash:Lir5oIjf552K/XN4bTul0VS3GfM')```
+2. Install **Dummy FIDO UAF Client** and **Opening Door Android App** on your another Android phone
+3. On **Opening Door Android App** touch on "Settings" on the main application menu and update "server endpoint" field to the **IP Address** and **PORT** where you are running the **FIDO UAF Demo Server**  
+4. On **Opening Door Android App** touch on "Whitelisting facetID" (to follow [FIDO UAF specifications](https://fidoalliance.org/specs/fido-uaf-v1.1-id-20170202/fido-appid-and-facets-v1.1-id-20170202.html) ).
+   1. Or you can do it: On **Opening Door Android App** touch on "See app facetID" on the main application menu and insert the showed value in [FIDO UAF Demo Server](https://github.com/emersonmello/UAF) MySQL database. For instance: ```INSERT INTO facets (fDesc) values ('android:apk-key-hash:Lir5oIjf552K/XN4bTul0VS3GfM')```
 
 ### Optional
 
 1. Install [Door lock NFC card reader for Android](https://github.com/emersonmello/DoorlockCardReader)
-1. On **Door lock card reader for Android** touch on "Settings" on the main application menu and update "server endpoint" field to the **IP Address** and **PORT** where you are running the **FIDO UAF Demo Server**
+2. On **Door lock card reader for Android** touch on "Settings" on the main application menu and update "server endpoint" field to the **IP Address** and **PORT** where you are running the **FIDO UAF Demo Server**
 
 
 ## Testing 
 
 1. Open **Opening Door Android App** and touch "Register" button
-1. Touch on "Do an authentication request"
-1. Follow the instructions provided by application (i.e. put your finger on the sensor, etc.) and you should see the message "Access Granted"
+2. Touch on "Do an authentication request"
+3. Follow the instructions provided by application (i.e. put your finger on the sensor, etc.) and you should see the message "Access Granted"
 
 ## UML Sequence Diagram 
 
